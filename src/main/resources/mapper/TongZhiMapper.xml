@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+   <mapper namespace="com.qiqu.mapper.TongZhiMapper">
+
+    <select id="getTongZhi" resultType="com.qiqu.entity.TongZhi">
+      select t_uid,tz.tz_id,tz_name,tz_body,img,tz_date,qun,tz_type,status,fname
+      from tz_tongzhi tz inner join tz_us tu on tz.tz_id=tu.tz_id
+      where send= #{send} and u_id=#{uId}
+    </select>
+    <select id="getRead" resultType="int" >
+        select count(*) from tz_tongzhi tz
+        inner join tz_us tu on tz.tz_id=tu.tz_id
+        where send=0 and tz_type=0
+        and u_id=#{uId}
+    </select>
+
+    <select id="getSign" resultType="int" >
+        select count(*) from tz_tongzhi tz
+        inner join tz_us tu on tz.tz_id=tu.tz_id
+        where send=0 and tz_type=1
+        and u_id=#{uId}
+    </select>
+
+    <update id="signAndRead">
+        update tz_us set status=1
+        where tz_id=#{tzId} and send=0 and u_id=#{uId}
+    </update>
+    <delete id="delete">
+        delete from tz_us
+        where t_uid=#{tuId}
+    </delete>
+    <insert id="send" parameterType="com.qiqu.entity.TongZhi">
+        insert into tz_us value (0,#{uId},#{tzId},1,1)
+    </insert>
+    <select id="getQun" resultType="com.qiqu.entity.Qun">
+        select distinct c.ql_id,c.ql_name from qun f inner join qun c on c.parent_id=f.ql_id where  c.parent_id=#{qlId}
+    </select>
+    <select id="getFaQun" resultType="com.qiqu.entity.Qun">
+        select  ql_id,school from qun  where parent_id=0
+    </select>
+</mapper>

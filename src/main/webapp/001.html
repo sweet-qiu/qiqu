@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+  <!--
+    表单直接上传
+      form 标签的设置
+        action   设置服务器地址
+        method   POST 方式
+        enctype  mutilpart/form-data
+          => enctype 设置请求头中的 content-type
+          => mutilpart 设置以二进制流的形式上传
+      input
+        type 选择成 file
+        name 设置一个名字
+  -->
+
+  <form action="/photoes" method="POST" enctype="multipart/form-data">
+    <input type="file" name="avatar">
+    <input type="text" name="username">
+    <button>上传</button>
+  </form>
+
+</body>
+</html>

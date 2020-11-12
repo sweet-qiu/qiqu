@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qiqu.mapper.KeJianMapper">
+    <select id="findBook" resultType="com.qiqu.entity.Book">
+        select book_id,book_name,book_fengmian,banben
+        from book where xk_id=#{xkId} and type_id=#{typeId}
+    </select>
+    <select id="findByBookId" resultType="com.qiqu.entity.Danyuan">
+        select distinct kj.dy_id,dy_name
+         from kj_kejian kj inner join danyuan
+         on kj.dy_id=danyuan.dy_id
+         where book_id= #{bookId}
+    </select>
+    <select id="getKjName" resultType="com.qiqu.entity.KeJian">
+        select kj_id,kj_name from kj_kejian
+        where dy_id=#{dyId}
+    </select>
+
+    <select id="faModel" resultType="com.qiqu.entity.KjModel">
+        select mk_id,mk_name from kj_mokuai where xk_id=#{xkId}
+        order by mk_order
+    </select>
+    <select id="chModel" resultType="com.qiqu.entity.KjModel">
+        select ch.mk_id, ch.mk_name from kj_mokuai ch inner join kj_mokuai fa
+        on ch.parent_id=fa.mk_id
+        where ch.kj_id=#{kjId} and fa.mk_id=#{mkId}
+    </select>
+    <select id="getMkName" resultType="com.qiqu.entity.KjModel">
+        select mk_id, mk_name from kj_mokuai
+        <foreach collection="list" item="mkId" open="(" close=")" separator=",">
+            #{mkId}
+        </foreach>
+        order by mk_order
+    </select>
+    <select id="getYuLan" resultType="com.qiqu.entity.YuLan">
+        select * from kj_yulan where mk_id=#{mkId}
+    </select>
+    <select id="getSheJi" resultType="com.qiqu.entity.SheJi">
+        select * from kj_sheji where  mk_id=#{mkId}
+    </select>
+    <select id="findByuId" resultType="com.qiqu.entity.KeJian">
+      select kj_name,kj_fengmian,creatDate,mkIds
+       from kj_user ks inner join kj_kejian kk on ks.kj_id= kk.kj_id
+      where u_id=#{uId};
+    </select>
+    <insert id="insertKeJian" parameterType="com.qiqu.entity.KeJian">
+        insert into kj_user value (#{uId},#{keJian.kjId},#{keJian.creatDate},#{keJIan.mkIds})
+    </insert>
+</mapper>

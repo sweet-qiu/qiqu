@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.qiqu.mapper.ZiLiaoMapper">
+    <select id="getMenu" resultType="com.qiqu.entity.ZiLiao">
+        select zl_id,zl_name,zl_read,zl_save,zl_fengmian,
+        t_name from zl_type ty inner join zl_ziliao zl
+        on zl.zl_tid=ty.zl_tid
+        where ty.zl_tid=2
+        limit 0,6;
+    </select>
+    <select id="jingXuan" resultType="com.qiqu.entity.ZiLiao">
+        select zl_fengmian,zl_id,zl_name,typename,zl_read,zl_save
+        from zl_ziliao
+        <where>
+
+            zl_tid=#{tId}
+            <if test="search!=null and search!=''">
+               and typename like #{search}
+               or zl_name like #{search}
+            </if>
+
+        </where>
+    </select>
+    <select id="getInfo" resultType="com.qiqu.entity.ZiLiao">
+        select zl_id, zl_name,zl_date,zl_read,zl_save from zl_ziliao
+        where zl_id=#{zlId}
+    </select>
+    <select id="getBody" resultType="com.qiqu.entity.ZlBody">
+        select body_type,body from zl_body
+         where zl_id=#{zlId} order  by lv
+    </select>
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!--自定义cookie
+    rememberMe配置
+    -->
+    <bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <!--生命时间-->
+        <property name="maxAge" value="180000"></property>
+        <!--自定义cookie的name-->
+        <property name="name" value="rememberMe"></property>
+    </bean>
+    <bean id="cookieRememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+        <!--引用自定义cookie-->
+        <property name="cookie" ref="rememberMeCookie"></property>
+    </bean>
+    <!--===========rememberMe配置结束============-->
+    <!--===========session配置============-->
+    <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <property name="name" value="sessionId"></property>
+        <property name="maxAge" value="18000"></property>
+    </bean>
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <property name="sessionIdCookie" ref="sessionIdCookie"></property>
+        <!-- in milliseconds-->
+        <property name="globalSessionTimeout" value="180000"></property>
+        <!--清空过期会话 -->
+        <property name="sessionValidationSchedulerEnabled" value="true"></property>
+        <!--是否允许url重写  （地址后拼接jsessionid）-->
+        <property name="sessionIdUrlRewritingEnabled" value="false"></property>
+    </bean>
+
+    <!--===========session配置结束============-->
+
+    <!--===========ehcache配置开始============-->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"></property>
+    </bean>
+    <!--===========ehcache配置结束============-->
+
+
+    <!--
+    shiro+spring整合的核心配置
+    -->
+    <!--1.SecurityManager  -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!-- 配置realm -->
+        <property name="realms" ref="myUserRealm"></property>
+        <!--配置记住我的cookie-->
+        <property name="rememberMeManager" ref="cookieRememberMeManager"></property>
+        <!--会话管理-->
+        <property name="sessionManager" ref="sessionManager"></property>
+        <!--缓存管理-->
+        <property name="cacheManager" ref="cacheManager"></property>
+
+    </bean>
+
+
+    <!--2.配置自定义realm  走数据库
+        默认：iniRealm shiro.ini
+     -->
+    <bean id="myUserRealm" class="com.qiqu.realm.MyUserRealm"></bean>
+
+    <!--3.shiroFilter
+    Define the Shiro Filter here (as a FactoryBean) instead of directly in web.xml -
+     web.xml uses the DelegatingFilterProxy to access this bean.
+
+     web.xml  /*  shiro拦截后，会把请求交给该过滤器处理
+     id="shiroFilter"  id需要和  web.xml 配置的filter的name属性一致
+     filter-name：shiroFilter
+    -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="loginUrl" value="/login.html"></property><!--登录界面-->
+        <property name="unauthorizedUrl" value="/unauthorized.json"></property><!--没有权限的跳转页面-->
+        <!--SecurityManager property must be set.-->
+        <property name="securityManager" ref="securityManager"></property>
+        <property name="filterChainDefinitions">
+            <!--
+                1)顺序  严格的过滤器往后配置
+                2)anon  匿名访问  DefaultFilter
+                3)authc  认证（登录）后才能访问
+                4)user   勾选了记住我能访问
+            -->
+            <value>
+                /** = anon
+                /json/** = anon
+                /public/** = anon
+                /sys/login = anon
+                /sys/hello = anon
+                /js/** = anon
+
+            </value>
+        </property>
+
+    </bean>
+</beans>

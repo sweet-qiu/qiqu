@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <mapper namespace="com.qiqu.mapper.ZuoYeMapper">
+<select id="getMkName" resultType="com.qiqu.entity.ZyMokuai">
+   select mk_id,title,descible,img, mk_type
+   from zy_mokuai where xk_id=#{xkId}
+</select>
+   <select id="getHuiBen" resultType="com.qiqu.entity.HuiBen">
+      select hb.hb_id,hb_fengmian,hb_name,hb_type,hb_status
+      from zy_hb_us zy right join zy_huiben hb
+      on zy.hb_id=hb.hb_id and
+      <if test="uId!=null and uId!=''">
+         u_id=#{uId}
+      </if>
+      <where>
+         mk_id=#{mkId} and dy_id=#{dyId}
+        <if test="search!=null and search!=''">
+           and hb_name like concat('%',#{search},'%')
+           or hb_type like concat('%',#{search},'%')
+        </if>
+      </where>
+   </select>
+   <select id="useHuiBen" resultType="com.qiqu.entity.HuiBen">
+      select hb.hb_id,hb_fengmian,hb_name,hb_type,hb_status
+      from zy_hb_us zy inner join zy_huiben hb
+      on zy.hb_id=hb.hb_id
+      where u_id=#{uId}
+   </select>
+   <insert id="addZy" >
+      insert into zy_hb_us values
+      (0,#{uId},1,#{hbId})
+
+   </insert>
+   <select id="getZyd" resultType="com.qiqu.entity.ZuoYe">
+      select zy_id,zy_name,clazz,grade,zy_status,dy_name,send,see,f_id
+      from zuoye zy
+      inner join danyuan dy on zy.dy_id=dy.dy_id
+      inner join  us_user us on us.u_id=zy.u_id
+      inner join clazz on us.cla_id=clazz.cla_id
+	  inner join grade on us.gra_id=grade.gra_id
+      where us.u_id=#{uId}
+       </select>
+   <insert id="addZyd" >
+      insert into zuoye value (0,#{uId},#{zyName},0,#{zyDate},0,1,0,0)
+   </insert>
+   <update id="change">
+      update zuoye set ${str}=1 where zy_id=#{zyId}
+   </update>
+   <select id="getBaoGao" resultType="com.qiqu.entity.BaoGao">
+      select  * from zy_baogao where f_id=#{fId}
+   </select>
+   <select id="getBgInfo" resultType="com.qiqu.entity.Stu">
+      select * from zy_stu where f_id=#{fId}
+   </select>
+   </mapper>
